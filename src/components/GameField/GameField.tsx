@@ -7,6 +7,7 @@ type Props = {
 
 export default function GameField({ charType }: Props) {
   const [score, setScore] = useState(0);
+  const [health, setHealth] = useState(100);
 
   let elements: NodeListOf<HTMLElement>;
   setTimeout(() => {
@@ -18,12 +19,18 @@ export default function GameField({ charType }: Props) {
         if (el.innerHTML === e.key) {
           el.classList.remove(S.move);
           el.innerHTML = "";
+          if (el.dataset.timeoutId) {
+            clearTimeout(Number(el.dataset.timeoutId));
+            delete el.dataset.timeoutId;
+          }
           setScore((prev) => prev + 1);
         }
       }
     });
   };
+
   addEventListener("keydown", handleKeyDown);
+
   useEffect(() => {
     const interval = setInterval(() => {
       const el = document.getElementById(
@@ -35,17 +42,15 @@ export default function GameField({ charType }: Props) {
         el.innerHTML = String.fromCharCode(
           Math.floor(Math.random() * 26) + 65
         ).toLowerCase();
-
-        setTimeout(() => {
+        el.dataset.timeoutId = setTimeout(() => {
           el.classList.remove(S.move);
           el.innerHTML = "";
-        }, 5000);
+          setHealth((prev) => prev - 10);
+        }, 5000).toString();
       }
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  console.log("rerender");
 
   return (
     <div className={S.gamefield}>
@@ -72,6 +77,11 @@ export default function GameField({ charType }: Props) {
         <p id="el18" className={S.el} onKeyDown={handleKeyDown}></p>
         <p id="el19" className={S.el} onKeyDown={handleKeyDown}></p>
         <p id="el20" className={S.el} onKeyDown={handleKeyDown}></p>
+      </div>
+      <p className={S.health_title}>Health: {health}</p>
+
+      <div className={S.health_wrapper} style={{ width: `${health}%` }}>
+        <div className={S.health}></div>
       </div>
     </div>
   );
