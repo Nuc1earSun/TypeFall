@@ -1,5 +1,5 @@
-import { CharType } from "../../types/CharType";
-import S from "./Modal.module.css";
+import { CharType } from "../types/CharType";
+import '../App.css'
 const LETTERS = "letters";
 const NUMBERS = "numbers";
 
@@ -7,11 +7,11 @@ type Props = {
   charType: CharType;
   setCharType: React.Dispatch<React.SetStateAction<CharType>>;
   CHAR_TYPES: CharType;
+  setGameOver: React.Dispatch<React.SetStateAction<boolean>>;
+  gameOver: boolean;
 };
 
-export default function Modal({ charType, setCharType, CHAR_TYPES }: Props) {
-  console.log(charType);
-
+export default function Modal({ charType, setCharType, CHAR_TYPES, setGameOver, gameOver }: Props) {
   const handleSetType = (e: React.ChangeEvent<HTMLInputElement>) => {
     const letters = document.getElementById(LETTERS) as HTMLInputElement;
     const numbers = document.getElementById(NUMBERS) as HTMLInputElement;
@@ -31,12 +31,15 @@ export default function Modal({ charType, setCharType, CHAR_TYPES }: Props) {
   const startGame = () => {
     if (charType) {
       const modal = document.getElementById("modal") as HTMLDivElement;
-      modal.classList.add(S.hidden);
+      const gamefield = document.getElementById("gamefield") as HTMLDivElement;
+      gamefield.classList.add("active");
+      modal.classList.add('hidden');
+      setGameOver(false);
     }
   };
 
   return (
-    <div className={S.modal} id="modal">
+    <div className={'modal'} id="modal">
       <h1>TYPE FALL</h1>
       <p>Select the types of characters you would like to practice</p>
 
