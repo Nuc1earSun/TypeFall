@@ -9,6 +9,11 @@ type Props = {
   difficulty: number;
 };
 
+let elements: NodeListOf<HTMLElement>;
+setTimeout(() => {
+  elements = document.querySelectorAll(`.el`);
+}, 0);
+
 export default function GameField({
   charType,
   gameOver,
@@ -19,14 +24,7 @@ export default function GameField({
   const [health, setHealth] = useState(100);
   const intervalId = useRef<number>(0);
 
-  let elements: NodeListOf<HTMLElement>;
-  setTimeout(() => {
-    elements = document.querySelectorAll(`.el`);
-  }, 0);
-
   const handleKeyDown = (e: KeyboardEvent) => {
-    console.log(e.key);
-
     elements.forEach((el) => {
       if (el.classList.contains("move")) {
         if (el.innerHTML === e.key) {
