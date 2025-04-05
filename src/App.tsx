@@ -12,6 +12,7 @@ const CHAR_TYPES: CharType = {
 function App() {
   const [charType, setCharType] = useState(CHAR_TYPES);
   const [gameOver, setGameOver] = useState(true);
+  const [difficulty, setDifficulty] = useState(1200);
 
   return (
     <>
@@ -21,11 +22,13 @@ function App() {
         CHAR_TYPES={CHAR_TYPES}
         setGameOver={setGameOver}
         gameOver={gameOver}
+        setDifficulty={setDifficulty}
       />
       <GameField
         charType={charType}
         gameOver={gameOver}
         setGameOver={setGameOver}
+        difficulty={difficulty}
       />
     </>
   );
