@@ -1,25 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CharType } from "../types/CharType";
 import "../App.css";
 type Props = {
   charType: CharType;
   gameOver: boolean;
+  setGameOver: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-export default function GameField({ charType, gameOver }: Props) {
+function getRandomChar(type: CharType) {
+  const chars = !type.letters
+    ? "0123456789"
+    : !type.numbers
+    ? "abcdefghijklmnopqrstuvwxyz"
+    : "abcdefghijklmnopqrstuvwxyz0123456789";
+  const randomIndex = Math.floor(Math.random() * chars.length);
+  return chars[randomIndex];
+}
+export default function GameField({ charType, gameOver, setGameOver }: Props) {
   const [score, setScore] = useState(0);
   const [health, setHealth] = useState(100);
+  const intervalId = useRef<number>(0);
 
   let elements: NodeListOf<HTMLElement>;
   setTimeout(() => {
     elements = document.querySelectorAll(`.el`);
   }, 0);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLParagraphElement>) => {
     elements.forEach((el) => {
-      if (el.classList.contains('move')) {
+      if (el.classList.contains("move")) {
         if (el.innerHTML === e.key) {
-          el.classList.remove('move');
+          el.classList.remove("move");
           el.innerHTML = "";
           if (el.dataset.timeoutId) {
             clearTimeout(Number(el.dataset.timeoutId));
@@ -33,32 +43,43 @@ export default function GameField({ charType, gameOver }: Props) {
 
   addEventListener("keydown", handleKeyDown);
 
-  const startGame = () => {
-    const el = document.getElementById(
-      `el${Math.floor(Math.random() * 20) + 1}`
-    ) as HTMLParagraphElement;
-
-    if (!el.classList.contains("move")) {
-      el.classList.add("move");
-      el.innerHTML = String.fromCharCode(
-        Math.floor(Math.random() * 26) + 65
-      ).toLowerCase();
-      el.dataset.timeoutId = setTimeout(() => {
-        el.classList.remove("move");
-        el.innerHTML = "";
-        setHealth((prev) => prev - 10);
-      }, 5000).toString();
-    }
-  };
-
   useEffect(() => {
     if (!gameOver) {
-      const interval = setInterval(() => {
-        startGame();
+      intervalId.current = setInterval(() => {
+        const el = document.getElementById(
+          `el${Math.floor(Math.random() * 20) + 1}`
+        ) as HTMLParagraphElement;
+
+        if (!el.classList.contains("move")) {
+          el.classList.add("move");
+          el.innerHTML = getRandomChar(charType);
+          el.dataset.timeoutId = setTimeout(() => {
+            if (el.classList.contains("move")) {
+              setHealth((prev) => prev - 10);
+            }
+            el.classList.remove("move");
+            el.innerHTML = "";
+          }, 5000).toString();
+        }
       }, 1000);
-      return () => clearInterval(interval);
+      return () => {
+        setHealth(100);
+        clearInterval(intervalId.current);
+      };
     }
   }, [gameOver]);
+
+  useEffect(() => {
+    if (health <= 0) {
+      setGameOver(true);
+      setScore(0);
+      elements.forEach((el) => {
+        el.classList.remove("move");
+        el.innerHTML = "";
+      });
+      clearInterval(intervalId.current);
+    }
+  }, [health]);
 
   return (
     <div className={"gamefield"} id="gamefield">

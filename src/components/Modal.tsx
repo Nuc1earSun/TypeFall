@@ -1,5 +1,6 @@
 import { CharType } from "../types/CharType";
-import '../App.css'
+import "../App.css";
+import { useEffect } from "react";
 const LETTERS = "letters";
 const NUMBERS = "numbers";
 
@@ -11,7 +12,13 @@ type Props = {
   gameOver: boolean;
 };
 
-export default function Modal({ charType, setCharType, CHAR_TYPES, setGameOver, gameOver }: Props) {
+export default function Modal({
+  charType,
+  setCharType,
+  CHAR_TYPES,
+  setGameOver,
+  gameOver,
+}: Props) {
   const handleSetType = (e: React.ChangeEvent<HTMLInputElement>) => {
     const letters = document.getElementById(LETTERS) as HTMLInputElement;
     const numbers = document.getElementById(NUMBERS) as HTMLInputElement;
@@ -30,37 +37,48 @@ export default function Modal({ charType, setCharType, CHAR_TYPES, setGameOver, 
 
   const startGame = () => {
     if (charType) {
-      const modal = document.getElementById("modal") as HTMLDivElement;
-      const gamefield = document.getElementById("gamefield") as HTMLDivElement;
-      gamefield.classList.add("active");
-      modal.classList.add('hidden');
-      setGameOver(false);
+      const top = window.innerHeight;
+      window.scrollTo({ top, behavior: "smooth" });
+      setTimeout(() => {
+        setGameOver(false);
+      }, 1000);
     }
   };
 
+  useEffect(() => {
+    if (gameOver) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [gameOver]);
+
   return (
-    <div className={'modal'} id="modal">
+    <div className={"modal"} id="modal">
       <h1>TYPE FALL</h1>
       <p>Select the types of characters you would like to practice</p>
 
       <div>
-        <input
-          type="checkbox"
-          name="letters"
-          id="letters"
-          onChange={handleSetType}
-        />
-        <label htmlFor="letters">Letters</label>
-        <input
-          type="checkbox"
-          name="numbers"
-          id="numbers"
-          onChange={handleSetType}
-        />
-        <label htmlFor="numbers">Numbers</label>
+        <div className="select__wrapper">
+          <input
+            type="checkbox"
+            name="letters"
+            id="letters"
+            onChange={handleSetType}
+          />
+          <label htmlFor="letters">Letters</label>
+        </div>
+        <div className="select__wrapper">
+          <input
+            type="checkbox"
+            name="numbers"
+            id="numbers"
+            onChange={handleSetType}
+          />
+          <label htmlFor="numbers">Numbers</label>
+        </div>
         <button
           disabled={!charType.letters && !charType.numbers}
           onClick={startGame}
+          className="start__button"
         >
           Start game
         </button>
